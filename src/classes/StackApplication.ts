@@ -1,20 +1,36 @@
 import { StackOperations } from "../types";
 import Statement from "./Statement";
+import Settings from "./Settings";
 
-export default class StackApplication implements StackOperations {
+export default class StackApplication
+  extends Settings
+  implements StackOperations
+{
   public top: number = -1;
   private operatorStack: string[] = [];
   private output: string = "";
   private statement: Statement = new Statement();
-  private isValidExpreesion: boolean = false;
 
-  public constructor(private expression: string) {
-    this.expression = this.expression.trim();
-    this.isValidExpreesion = Boolean(this.expression.length);
+  public constructor(
+    private expression: string,
+    isUppercase: boolean = false,
+    canIndent: boolean = false
+  ) {
+    super(isUppercase, canIndent);
+    this.init(expression);
+  }
+
+  public init(expression: string): void {
+    this.expression = expression.trim();
+    this.isValidExpression = Boolean(this.expression.length);
   }
 
   public getExpression(): string {
     return this.expression;
+  }
+
+  public setExpression(expression: string): void {
+    this.init(expression);
   }
 
   public push(value: string): void {
@@ -30,11 +46,17 @@ export default class StackApplication implements StackOperations {
     return undefined;
   }
 
-  public getOutput() {
+  public getOutput(): string {
+    if(this.canIndent){
+      return this.output.split("").join(" ");
+    }
+    if(this.isUppercase){
+      return this.output.toUpperCase();
+    }
     return this.output;
   }
 
-  private setOutput(input: string) {
+  private setOutput(input: string): void {
     if (input !== "(" && input !== ")" && input !== undefined) {
       this.output += input;
     }
@@ -49,12 +71,19 @@ export default class StackApplication implements StackOperations {
     return this.operatorStack[this.top];
   }
 
+  private getOperators(): string{
+    if(this.canIndent){
+      return this.operatorStack.join(" ");
+    }
+    return this.operatorStack.join("");
+  }
+
   public toPostfix(): string | null {
-    return this.isValidExpreesion ? this.getOutput() : null;
+    return this.isValidExpression ? this.getOutput() : null;
   }
 
   public toInfix(): string | null {
-    return this.isValidExpreesion ? this.getExpression() : null;
+    return this.isValidExpression ? this.getExpression() : null;
   }
 
   private checkTop(operators: string[]): boolean {
@@ -62,7 +91,7 @@ export default class StackApplication implements StackOperations {
   }
 
   public conversion(): void {
-    if (!this.isValidExpreesion) return;
+    if (!this.isValidExpression) return;
 
     for (let i: number = 0; i < this.expression.length; i++) {
       const input: string = this.expression[i];
@@ -151,7 +180,7 @@ export default class StackApplication implements StackOperations {
 
       this.statement.createStatement(
         input,
-        this.operatorStack.join(""),
+        this.getOperators(),
         this.getOutput()
       );
     }
@@ -162,7 +191,7 @@ export default class StackApplication implements StackOperations {
         this.setOutput(operator);
         this.statement.createStatement(
           null,
-          this.operatorStack.join(""),
+          this.getOperators(),
           this.getOutput()
         );
       }
