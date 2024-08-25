@@ -10,7 +10,7 @@ displaying the conversion process. The class also handles settings such as enabl
 capitalization for the output. The main functionality lies in the `conversion` method, where it
 processes the input expression and converts it to the desired notation based on the expression type
 set. The `display` method outputs the conversion process in a tabular format based on the expression */
-export default class extends Settings implements StackOperations {
+export default class StackApplication extends Settings implements StackOperations {
   public top: number = -1;
   private operatorStack: string[] = [];
   private output: string = "";
