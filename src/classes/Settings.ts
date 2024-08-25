@@ -1,9 +1,12 @@
 import { AppSettings } from "../types";
+import ExpressionTypes from "../enums/ExpressionTypes";
 
-/* This TypeScript code defines an abstract class named `Settings` that serves as a base class for
-other classes to inherit from. Here is a breakdown of what the code is doing: */
+
+/* This code snippet is defining an abstract class named `Settings` in TypeScript. Here is a breakdown
+of what the class is doing: */
 export default abstract class Settings {
   protected isValidExpression: boolean = false;
+  protected expressionType = ExpressionTypes.Postfix;
 
   public constructor(protected settings?: Partial<AppSettings>) {
     this.defaultSettings();

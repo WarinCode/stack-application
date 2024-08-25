@@ -1,4 +1,4 @@
-import { ShowExpression } from "../types";
+import { ToPostfix } from "../types";
 
 /* The class Statement in TypeScript represents a mathematical statement with infix, operator stack,
 and postfix expressions. */
@@ -22,9 +22,9 @@ export default class Statement {
     }
   }
 
-  public getStatements(): ShowExpression[] {
+  public getStatements(): ToPostfix[] {
     return this.statements.map(
-      ({ infix, operatorStack, postfix }: Statement): ShowExpression => {
+      ({ infix, operatorStack, postfix }: Statement): ToPostfix => {
         return { infix, operatorStack, postfix };
       }
     );

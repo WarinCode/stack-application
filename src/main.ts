@@ -1,9 +1,10 @@
 import StackApplication from "./classes/StackApplication";
+import ExpressionTypes from "./enums/ExpressionTypes";
 
-/* The `expressions` constant is an array of mathematical expressions in infix notation. Each string in
-the array represents a mathematical expression using variables and operators. These expressions will
-be processed and converted to postfix notation using a `StackApplication` class in the TypeScript
-code snippet provided. */
+/* The `expressions` constant is an array of strings that contains various infix mathematical
+expressions. These expressions represent mathematical operations using operands (like A, B, C) and
+operators (like +, -, *, /). The purpose of this array is to demonstrate the conversion of infix
+expressions to postfix and prefix expressions using a Stack data structure. */
 const expressions: string[] = [
   "A + B",
   "A * B + C",
@@ -21,10 +22,9 @@ const expressions: string[] = [
   "K + L - M * N + (O ^ P) * W / U / V * T + Q",
 ];
 
-/* The code snippet you provided is iterating over each mathematical expression in the `expressions`
-array using the `forEach` method. For each expression, it creates a new instance of the
-`StackApplication` class, passing the expression and an object with configuration options
-(`enableIndentation` and `enableCapitalize`). */
+/* This code snippet is converting infix mathematical expressions to postfix expressions using a Stack
+data structure. Here's a breakdown of what it does: */
+console.log("Convert from Infix expression to Postfix expression.");
 expressions.forEach((expression: string, index: number): void => {
   const stackApp: StackApplication = new StackApplication(expression, {
     enableIndentation: true,
@@ -35,5 +35,20 @@ expressions.forEach((expression: string, index: number): void => {
   console.log(`Infix expression: ${stackApp.toInfix()}`);
   console.log(`Postfix expression: ${stackApp.toPostfix()}`);
   stackApp.display();
-  console.log();
+});
+
+/* This code snippet is converting infix mathematical expressions to prefix expressions using a Stack
+data structure. Here's a breakdown of what it does: */
+console.log("Convert from Infix expression to Prefix expression.");
+expressions.forEach((expression: string, index: number): void => {
+  const stackApp: StackApplication = new StackApplication(expression, {
+    enableIndentation: true,
+    enableCapitalize: true,
+  });
+  stackApp.setExpressionType(ExpressionTypes.Prefix);
+  stackApp.conversion();
+  console.log(`Example ${index + 1}`);
+  console.log(`Infix expression: ${stackApp.toInfix()}`);
+  console.log(`Prefix expression: ${stackApp.toPostfix()}`);
+  stackApp.display();
 });

@@ -1,14 +1,16 @@
-import { StackOperations, AppSettings } from "../types";
+import { StackOperations, AppSettings, ToPostfix, ToPrefix } from "../types";
 import Statement from "./Statement";
 import Settings from "./Settings";
+import ExpressionTypes from "../enums/ExpressionTypes";
 
-
-/* This TypeScript class is responsible for handling the conversion of infix expressions to postfix
-expressions. Here is a breakdown of what the class is doing: */
-export default class
-  extends Settings
-  implements StackOperations
-{
+/* The above code is a TypeScript class that implements stack operations for converting mathematical
+expressions between infix, postfix, and prefix notations. It includes methods for pushing and
+popping operators onto a stack, converting expressions to postfix, prefix, and infix notations, and
+displaying the conversion process. The class also handles settings such as enabling indentation and
+capitalization for the output. The main functionality lies in the `conversion` method, where it
+processes the input expression and converts it to the desired notation based on the expression type
+set. The `display` method outputs the conversion process in a tabular format based on the expression */
+export default class extends Settings implements StackOperations {
   public top: number = -1;
   private operatorStack: string[] = [];
   private output: string = "";
@@ -19,7 +21,7 @@ export default class
     settings?: Partial<AppSettings>
   ) {
     super(settings);
-    this.init(expression);
+    this.init(this.expression);
   }
 
   public override init(expression: string): void {
@@ -50,18 +52,30 @@ export default class
 
   public getOutput(): string {
     if (this.settings?.enableIndentation) {
-      this.output = this.output.split("").filter((char: string) => char !== " ").join(" ");
+      this.output = this.output
+        .split("")
+        .filter((char: string) => char !== " ")
+        .join(" ");
     }
     if (this.settings?.enableCapitalize) {
       this.output = this.output.toUpperCase();
     }
+    if(this.expressionType === ExpressionTypes.Prefix){
+      return this.output.split("").reverse().join("");
+    }
     return this.output;
   }
 
-  private setOutput(input: string): void {
-    if (input !== "(" && input !== ")" && input !== undefined) {
+  private setOutput(
+    input: string
+  ): void {
+    if (input !== "(" && input !== ")" && input !== undefined && input !== "") {
       this.output += input;
     }
+  }
+
+  public setExpressionType(type: ExpressionTypes = ExpressionTypes.Postfix): void {
+    this.expressionType = type;
   }
 
   private isEmpty(): boolean {
@@ -88,9 +102,9 @@ export default class
   }
 
   private getOperators(): string {
-    if(this.settings?.enableSeparator && this.settings?.enableIndentation){
+    if (this.settings?.enableSeparator && this.settings?.enableIndentation) {
       return this.operatorStack.join(", ");
-    } else if(this.settings?.enableSeparator){
+    } else if (this.settings?.enableSeparator) {
       return this.operatorStack.join(",");
     } else if (this.settings?.enableIndentation) {
       return this.operatorStack.join(" ");
@@ -99,6 +113,10 @@ export default class
   }
 
   public toPostfix(): string | null {
+    return this.isValidExpression ? this.getOutput() : null;
+  }
+
+  public toPrefix(): string | null {
     return this.isValidExpression ? this.getOutput() : null;
   }
 
@@ -112,9 +130,23 @@ export default class
 
   public conversion(): void {
     if (!this.isValidExpression) return;
+    if(this.expressionType === ExpressionTypes.Infix) return;
+
+    let temp: string = this.expression;
+    if (this.expressionType === ExpressionTypes.Prefix) {
+      temp = temp
+        .split("")
+        .reverse()
+        .map((char: string): string => {
+          if (char === "(") return ")";
+          else if (char === ")") return "(";
+          else return char;
+        })
+        .join("");
+    }
 
     for (let i: number = 0; i < this.expression.length; i++) {
-      const input: string = this.expression[i];
+      const input: string = temp[i];
       switch (input) {
         case " ":
           break;
@@ -203,6 +235,16 @@ export default class
   }
 
   public display(): void {
-    console.table(this.statement.getStatements());
+    if (this.expressionType === ExpressionTypes.Postfix) {
+      console.table(this.statement.getStatements());
+    } else if (this.expressionType === ExpressionTypes.Prefix) {
+      console.table(
+        this.statement
+          .getStatements()
+          .map(({ infix, operatorStack, postfix }: ToPostfix): ToPrefix => {
+            return { infix, operatorStack, prefix: postfix };
+          })
+      );
+    }
   }
 }
