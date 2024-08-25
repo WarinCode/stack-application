@@ -1,5 +1,7 @@
 import { ShowExpression } from "../types";
 
+/* The class Statement in TypeScript represents a mathematical statement with infix, operator stack,
+and postfix expressions. */
 export default class Statement {
   public infix: string | null = "";
   public operatorStack: string | null = "";

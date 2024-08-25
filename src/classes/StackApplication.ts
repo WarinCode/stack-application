@@ -1,8 +1,11 @@
-import { StackOperations } from "../types";
+import { StackOperations, AppSettings } from "../types";
 import Statement from "./Statement";
 import Settings from "./Settings";
 
-export default class StackApplication
+
+/* This TypeScript class is responsible for handling the conversion of infix expressions to postfix
+expressions. Here is a breakdown of what the class is doing: */
+export default class
   extends Settings
   implements StackOperations
 {
@@ -13,16 +16,15 @@ export default class StackApplication
 
   public constructor(
     private expression: string,
-    isUppercase: boolean = false,
-    canIndent: boolean = false
+    settings?: Partial<AppSettings>
   ) {
-    super(isUppercase, canIndent);
+    super(settings);
     this.init(expression);
   }
 
-  public init(expression: string): void {
+  public override init(expression: string): void {
     this.expression = expression.trim();
-    this.isValidExpression = Boolean(this.expression.length);
+    this.isValidExpression = Boolean(this.expression);
   }
 
   public getExpression(): string {
@@ -47,11 +49,11 @@ export default class StackApplication
   }
 
   public getOutput(): string {
-    if(this.canIndent){
-      return this.output.split("").join(" ");
+    if (this.settings?.enableIndentation) {
+      this.output = this.output.split("").filter((char: string) => char !== " ").join(" ");
     }
-    if(this.isUppercase){
-      return this.output.toUpperCase();
+    if (this.settings?.enableCapitalize) {
+      this.output = this.output.toUpperCase();
     }
     return this.output;
   }
@@ -66,13 +68,31 @@ export default class StackApplication
     return this.operatorStack.length === 0;
   }
 
+  public override newSettings(settings: Partial<AppSettings>): void {
+    this.settings = settings;
+    this.defaultSettings();
+    this.reset();
+  }
+
+  protected override reset(): void {
+    this.output = "";
+    this.top = -1;
+    this.operatorStack = [];
+    this.statement = new Statement();
+    this.init(this.expression);
+  }
+
   private getTop(): string {
     this.top = this.operatorStack.length - 1;
     return this.operatorStack[this.top];
   }
 
-  private getOperators(): string{
-    if(this.canIndent){
+  private getOperators(): string {
+    if(this.settings?.enableSeparator && this.settings?.enableIndentation){
+      return this.operatorStack.join(", ");
+    } else if(this.settings?.enableSeparator){
+      return this.operatorStack.join(",");
+    } else if (this.settings?.enableIndentation) {
       return this.operatorStack.join(" ");
     }
     return this.operatorStack.join("");
@@ -116,7 +136,9 @@ export default class StackApplication
           }
           break;
         case "^":
-          if (this.getTop() === input) {
+          if (this.isEmpty()) {
+            this.push(input);
+          } else if (this.getTop() === input) {
             const operator: string = this.pop() as string;
             this.push(input);
             this.setOutput(operator);
@@ -126,11 +148,9 @@ export default class StackApplication
           break;
         case "*":
         case "/":
-          // !["*", "/"].includes(this.getTop())
-          if (!this.checkTop(["*", "/"])) {
+          if (!this.checkTop(["*", "/"]) || this.isEmpty()) {
             this.push(input);
           } else {
-            // ["*", "/"].includes(this.getTop())
             while (this.checkTop(["*", "/"])) {
               if (!this.isEmpty()) {
                 const operator: string = this.pop() as string;
@@ -141,21 +161,12 @@ export default class StackApplication
             }
             this.push(input);
           }
-          // if (["*", "/"].includes(this.getTop())) {
-          //   const operator: string = this.pop() as string;
-          //   this.push(input);
-          //   this.setOutput(operator);
-          // } else {
-          //   this.push(input);
-          // }
           break;
         case "-":
         case "+":
-          // !["-", "+", "*", "/", "^"].includes(this.getTop())
-          if (!this.checkTop(["-", "+", "*", "/", "^"])) {
+          if (!this.checkTop(["-", "+", "*", "/", "^"]) || this.isEmpty()) {
             this.push(input);
           } else {
-            // ["-", "+", "*", "/", "^"].includes(this.getTop())
             while (this.checkTop(["-", "+", "*", "/", "^"])) {
               if (!this.isEmpty()) {
                 const operator: string = this.pop() as string;
@@ -166,13 +177,6 @@ export default class StackApplication
             }
             this.push(input);
           }
-          // if (["-", "+", "*", "/", "^"].includes(this.getTop())) {
-          //   const operator: string = this.pop() as string;
-          //   this.push(input);
-          //   this.setOutput(operator);
-          // } else {
-          //   this.push(input);
-          // }
           break;
         default:
           this.setOutput(input);
