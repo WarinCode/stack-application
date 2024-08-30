@@ -10,7 +10,10 @@ displaying the conversion process. The class also handles settings such as enabl
 capitalization for the output. The main functionality lies in the `conversion` method, where it
 processes the input expression and converts it to the desired notation based on the expression type
 set. The `display` method outputs the conversion process in a tabular format based on the expression */
-export default class StackApplication extends Settings implements StackOperations {
+export default class StackApplication
+  extends Settings
+  implements StackOperations
+{
   public top: number = -1;
   private operatorStack: string[] = [];
   private output: string = "";
@@ -60,21 +63,21 @@ export default class StackApplication extends Settings implements StackOperation
     if (this.settings?.enableCapitalize) {
       this.output = this.output.toUpperCase();
     }
-    if(this.expressionType === ExpressionTypes.Prefix){
+    if (this.expressionType === ExpressionTypes.Prefix) {
       return this.output.split("").reverse().join("");
     }
     return this.output;
   }
 
-  private setOutput(
-    input: string
-  ): void {
+  private setOutput(input: string): void {
     if (input !== "(" && input !== ")" && input !== undefined && input !== "") {
       this.output += input;
     }
   }
 
-  public setExpressionType(type: ExpressionTypes = ExpressionTypes.Postfix): void {
+  public setExpressionType(
+    type: ExpressionTypes = ExpressionTypes.Postfix
+  ): void {
     this.expressionType = type;
   }
 
@@ -130,7 +133,7 @@ export default class StackApplication extends Settings implements StackOperation
 
   public conversion(): void {
     if (!this.isValidExpression) return;
-    if(this.expressionType === ExpressionTypes.Infix) return;
+    if (this.expressionType === ExpressionTypes.Infix) return;
 
     let temp: string = this.expression;
     if (this.expressionType === ExpressionTypes.Prefix) {
@@ -234,17 +237,19 @@ export default class StackApplication extends Settings implements StackOperation
     }
   }
 
-  public display(): void {
+  public getStatements(): ToPostfix[] | ToPrefix[] {
     if (this.expressionType === ExpressionTypes.Postfix) {
-      console.table(this.statement.getStatements());
-    } else if (this.expressionType === ExpressionTypes.Prefix) {
-      console.table(
-        this.statement
-          .getStatements()
-          .map(({ infix, operatorStack, postfix }: ToPostfix): ToPrefix => {
-            return { infix, operatorStack, prefix: postfix };
-          })
-      );
+      return this.statement.getStatements();
+    } else {
+      return this.statement
+        .getStatements()
+        .map(({ infix, operatorStack, postfix }: ToPostfix): ToPrefix => {
+          return { infix, operatorStack, prefix: postfix };
+        });
     }
+  }
+
+  public display(): void {
+    console.table(this.getStatements());
   }
 }
