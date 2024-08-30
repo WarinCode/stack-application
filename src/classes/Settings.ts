@@ -29,7 +29,7 @@ export default abstract class Settings {
     }
     // this.showSettings();
   }
-  private showSettings(): void {
-    console.log(this.settings);
-  }
+  // private showSettings(): void {
+  //   console.log(this.settings);
+  // }
 }
