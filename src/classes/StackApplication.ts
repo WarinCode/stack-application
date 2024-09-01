@@ -116,15 +116,24 @@ export default class StackApplication
   }
 
   public toPostfix(): string | null {
-    return this.isValidExpression ? this.getOutput() : null;
+    if (this.expressionType === ExpressionTypes.Postfix) {
+      return this.isValidExpression ? this.getOutput() : null;
+    }
+    return null;
   }
 
   public toPrefix(): string | null {
-    return this.isValidExpression ? this.getOutput() : null;
+    if (this.expressionType === ExpressionTypes.Prefix) {
+      return this.isValidExpression ? this.getOutput() : null;
+    }
+    return null;
   }
 
   public toInfix(): string | null {
-    return this.isValidExpression ? this.getExpression() : null;
+    if (this.expressionType === ExpressionTypes.Infix) {
+      return this.isValidExpression ? this.getExpression() : null;
+    }
+    return null;
   }
 
   private checkTop(operators: string[]): boolean {
