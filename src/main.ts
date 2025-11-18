@@ -30,9 +30,10 @@ expressions.forEach((expression: string, index: number): void => {
     enableIndentation: true,
     enableCapitalize: true,
   });
+  stackApp.setExpressionType(ExpressionTypes.Postfix);
   stackApp.conversion();
   console.log(`Example ${index + 1}`);
-  console.log(`Infix expression: ${stackApp.toInfix()}`);
+  console.log(`Infix expression: ${expression}`);
   console.log(`Postfix expression: ${stackApp.toPostfix()}`);
   stackApp.display();
 });
@@ -48,7 +49,7 @@ expressions.forEach((expression: string, index: number): void => {
   stackApp.setExpressionType(ExpressionTypes.Prefix);
   stackApp.conversion();
   console.log(`Example ${index + 1}`);
-  console.log(`Infix expression: ${stackApp.toInfix()}`);
-  console.log(`Prefix expression: ${stackApp.toPostfix()}`);
+  console.log(`Infix expression: ${expression}`);
+  console.log(`Prefix expression: ${stackApp.toPrefix()}`);
   stackApp.display();
 });
